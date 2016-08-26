@@ -1,0 +1,47 @@
+# -*- coding: cp1252 -*-
+import nltk
+from nameparser.parser import HumanName
+
+def get_human_names(text):
+    tokens = nltk.tokenize.word_tokenize(text)
+    pos = nltk.pos_tag(tokens)
+    sentt = nltk.ne_chunk(pos, binary = False)
+    person_list = []
+    person = []
+    name = ""
+    for subtree in sentt.subtrees(filter=lambda t: t.label() == 'PERSON'):
+        for leaf in subtree.leaves():
+            person.append(leaf[0])
+        if len(person) > 1: #avoid grabbing lone surnames
+            for part in person:
+                name += part + ' '
+            if name[:-1] not in person_list:
+                person_list.append(name[:-1])
+            name = ''
+        person = []
+
+    return (person_list)
+text = '''recorded in official records, solano county 112712016 3:04 pm
+marc c. tonnesen ar51 assessor/recorder 06 and when recorded mail
+to: cr beeler f , 7 titles: 1 pages: 1 doc# 201600006922 name
+joh n h. beeler, jr. sweet 112 ploy way fees 13.00 iii 11111 imi ai
+taxes 0.00 other'''
+text = """
+Some economists have responded positively to Bitcoin, including 
+Francois R. Velde, senior economist of the Federal Reserve in Chicago 
+who described it as "an elegant solution to the problem of creating a 
+digital currency." In November 2013 Richard Branson announced that 
+Virgin Galactic would accept Bitcoin as payment, saying that he had invested 
+in Bitcoin and found it "fascinating how a whole new global currency 
+has been created", encouraging others to also invest in Bitcoin.
+Other economists commenting on Bitcoin have been critical. 
+Economist Paul Krugman has suggested that the structure of the currency 
+incentivizes hoarding and that its value derives from the expectation that 
+others will accept it as payment. Economist Larry Summers has expressed 
+a "wait and see" attitude when it comes to Bitcoin. Nick Colas, a market 
+strategist for ConvergEx Group, has remarked on the effect of increasing 
+use of Bitcoin and its restricted supply, noting, "When incremental 
+adoption meets relatively fixed supply, it should be no surprise that 
+prices go up. And that’s exactly what is happening to BTC prices."
+"""
+print get_human_names(text)
